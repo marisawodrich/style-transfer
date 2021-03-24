@@ -1,5 +1,8 @@
 # Reimplementation of the Paper 'A Neural Algorithm of Artistic Style' (2015)
 
+Reimplementation by Marisa Wodrich and Johanna Linkemeyer for the course 'Implementing Artificial Neural Networks with TensorFlow'. The paper for this reimplementation can be found here.
+
+The original paper by Leon A. Gatys, Alexander S. Ecker and Matthias Bethge can be found [here](https://arxiv.org/abs/1508.06576).
 
 ## Introduction
 Was ist das + Beispielbilder
