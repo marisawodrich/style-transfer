@@ -6,7 +6,7 @@ import cv2
 import matplotlib.pyplot as plt
 
 from helpers import create_required_directories, load_all_images, test_preprocessing, choose_images, clip_values, \
-    CONTENT_TITLE_DICT, STYLE_TITLE_DICT
+    CONTENT_TITLE_DICT, STYLE_TITLE_DICT, PATH_GENERATED, PATH_STYLE, PATH_CONTENT
 from visualize import visualize_images
 from model import build_model, loss_content, loss_style
 from preprocessing import tensor_to_img
@@ -135,8 +135,7 @@ def transfer_artistic_style(model_st,
 
     # Save final image
     final_img = cv2.cvtColor(img_gen, cv2.COLOR_RGB2BGR)
-    save_path = os.path.join('../images', 'generated')
-    cv2.imwrite(os.path.join(save_path, save_name), final_img)
+    cv2.imwrite(os.path.join(PATH_GENERATED, save_name), final_img)
 
 
 def run_all_combinations(model_st, content_images, style_images, content_weight, style_weight, num_iterations=200):
@@ -185,8 +184,8 @@ if __name__ == '__main__':
     load_all_images(STYLE_IMAGES, CONTENT_IMAGES)
 
     # Visualize images
-    visualize_images(os.path.join('../images', 'style'), 'STYLE IMAGES')
-    visualize_images(os.path.join('../images', 'content'), 'CONTENT IMAGES')
+    visualize_images(PATH_STYLE, 'STYLE IMAGES')
+    visualize_images(PATH_CONTENT, 'CONTENT IMAGES')
 
     test_preprocessing()
 

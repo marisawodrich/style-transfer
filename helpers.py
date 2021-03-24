@@ -8,7 +8,7 @@ from preprocessing import img_to_tensor, tensor_to_img
 
 CONTENT_TITLE_DICT = {}
 STYLE_TITLE_DICT = {}
-PATH = '../images'
+PATH = 'style-transfer/images'
 PATH_STYLE = os.path.join(PATH, 'style')
 PATH_CONTENT = os.path.join(PATH, 'content')
 PATH_GENERATED = os.path.join(PATH, 'generated')
