@@ -8,7 +8,7 @@ from preprocessing import img_to_tensor, tensor_to_img
 
 CONTENT_TITLE_DICT = {}
 STYLE_TITLE_DICT = {}
-PATH = 'style-transfer/images'
+PATH = 'images'
 PATH_STYLE = os.path.join(PATH, 'style')
 PATH_CONTENT = os.path.join(PATH, 'content')
 PATH_GENERATED = os.path.join(PATH, 'generated')
@@ -81,7 +81,7 @@ def load_image_from_link(link, image_name, image_description, style_image=True):
     # assert if path exists
 
     # image_path = os.path.join('/content', 'images', image_type, image_name)
-    image_path = os.path.join('../images', image_type, image_name)  # For running notebook locally
+    image_path = os.path.join(PATH, image_type, image_name)  # For running notebook locally
 
     image = io.imread(link)
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -107,7 +107,7 @@ def load_all_images(style_images, content_images):
 
 def test_preprocessing():
 
-    path_style = os.path.join('../images', 'style')
+    path_style = PATH_STYLE
 
     # Define path to test image
     img_path = os.path.join(path_style, 'the_scream.jpg')
