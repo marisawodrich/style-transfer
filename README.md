@@ -16,7 +16,7 @@ Was ist das + Beispielbilder
 * requirements.txt
 
 ## Running the Style Transfer
-1. [Colab](https://colab.research.google.com/drive/1DUc5valWaSWUXQEYey_8FO_zYaXOabe7#scrollTo=fvAwuQhDfqsA)
+1. [Colab](https://colab.research.google.com/drive/1QyBRdjDXfPIMuP-nY-vcj8sMbqkp2viM#scrollTo=gS0RpbSgFcXb)
 2. Local:
     * git clone
     * pip3 install -r requirements.txt
