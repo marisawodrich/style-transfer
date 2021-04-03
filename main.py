@@ -9,7 +9,7 @@ from helpers import create_required_directories, load_all_images, test_preproces
     CONTENT_TITLE_DICT, STYLE_TITLE_DICT, PATH_GENERATED, PATH_STYLE, PATH_CONTENT
 from visualize import visualize_images, plot_combinations, visualize_progress
 from model import StyleModel, loss_content, loss_style
-from preprocessing import tensor2img
+from processing import tensor2img
 
 # Predefined style images:
 #       - Starry Night by Vincent van Gogh

@@ -4,7 +4,7 @@ import numpy as np
 import os
 import cv2
 
-from preprocessing import img2tensor, tensor2img
+from processing import img2tensor, tensor2img
 
 CONTENT_TITLE_DICT = {}
 STYLE_TITLE_DICT = {}
