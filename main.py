@@ -5,11 +5,11 @@ import time
 import cv2
 import matplotlib.pyplot as plt
 
-from helpers import create_required_directories, load_all_images, test_preprocessing, choose_images, clip_values, \
+from helpers import create_required_directories, load_all_images, test_preprocessing, prep_images, clip_values, \
     CONTENT_TITLE_DICT, STYLE_TITLE_DICT, PATH_GENERATED, PATH_STYLE, PATH_CONTENT
-from visualize import visualize_images
-from model import build_model, loss_content, loss_style
-from preprocessing import tensor_to_img
+from visualize import visualize_images, plot_combinations, visualize_progress
+from model import StyleModel, loss_content, loss_style
+from preprocessing import tensor2img
 
 # Predefined style images:
 #       - Starry Night by Vincent van Gogh
@@ -56,57 +56,65 @@ CONTENT_IMAGES = [['https://www.myhomebook.de/data/uploads/2020/02/gettyimages-1
                    False]]
 
 
-def transfer_artistic_style(model_st,
-                            iterations,
+def transfer_artistic_style(iterations,
                             content,
                             style,
                             optimizer,
                             weight_content,
                             weight_style,
-                            save_name='final.jpg'):
+                            content_orig_shape=(224, 224, 3),
+                            save_name='final.jpg',
+                            visualize_intermediate=False):
     """
-    Runs the artistic style transfer. The result image will be saved. It will contain the content of the
-    content image and have the style of the style image. The 'strength' of content and style can be
-    influenced by changing the respective weights.
-    :param model_st: (tf sequential) Model for style transfer
-    :param iterations: (int) Number of iterations optimization of image creation
-    :param content: (tensor) image with content info
-    :param style: (tensor) image with style info
-    :param optimizer:
-    :param weight_content: (float) weight for content image
-    :param weight_style: (float) weight for style image
-    :param save_name: (string) name for the result image (will be saved in directory 'images/generated'
-    :return: None
+    This function runs the style transfer on a given content image with a given
+    style image.
+
+    :param iterations: (int) number of iterations of style transform
+    :param content: (tensor) preprocessed content image
+    :param style: (tensor) preprocessed style image
+    :param optimizer: optimizer for model
+    :param weight_content: (float) weight for the content loss
+    :param weight_style: (float) weight for the style loss
+    :param content_orig_shape: (array) shape of the original content image
+    :param save_name: (string) name of the result image
+    :param visualize_intermediate: (bool) whether to visualize during the transfer progress
+    return: (list) list of strings containing the names of the intermediate images
     """
 
     print('Start')
 
-    # Generate white image, result image should match the size of the
-    # content image
+    # Create an image to apply the operations to (like content image)
     image_generated = tf.Variable(content, dtype=np.float32)
+    img_gen = tensor2img(image_generated, content_orig_shape)
 
     # Get the content layers (first layer returned by model)
-    target_content = model_st(content)[0]
+    target_content = model(content)[:model.number_content_layers]
 
-    # Get the style layers ()
-    target_style = model_st(style)[1:]
+    # Get the style layers (all layers except the first for our case)
+    target_style = model(style)[model.number_content_layers:]
+
+    # Initialize list to store image names for plotting the progress later.
+    intermediate_img_names = []
 
     print('Got target images, start optimizing.')
 
-    for i in range(iterations):
+    start_time = time.time()
+    time_intermediate = 0
 
-        timer = time.time()
+    # Iteratively adapt the generated image to match the style image.
+    for i in range(iterations):
 
         # Compute gradients
         with tf.GradientTape() as tape:
 
             # Process image with model
-            output = model_st(image_generated)
+            output = model(image_generated)
 
-            output_content = output[0]
-            output_style = output[1:]
+            # Again, output of the first layer is content output, all other layers
+            # are style outputs in our case
+            output_content = output[:model.number_content_layers]
+            output_style = output[model.number_content_layers:]
 
-            # tape.watch(image_generated)
             # Calculate loss with given weights
             content_loss = loss_content(output_content, target_content)
             style_loss = loss_style(output_style, target_style)
@@ -115,62 +123,94 @@ def transfer_artistic_style(model_st,
         # Gradients with respect to generated image
         gradients = tape.gradient(loss, image_generated)
 
-        # Create a new image (apply gradients to image)
+        # Generate optimized image (apply gradients to image)
         optimizer.apply_gradients([(gradients, image_generated)])
 
+        # Assign new values image, but clip values before if necessary
         image_generated.assign(clip_values(image_generated))
 
-        if i % 10 == 0:
-            print('Iteration: ', str(i), '--- Loss: ', np.array(loss).astype(np.float32), '--- Content Loss: ',
+        time_intermediate += time.time() - start_time - time_intermediate
+
+        # Keep track of the progress. The progress information will be given
+        # 20 times: some information and (optionally) an intermediate image
+        # will be printed/ plotted.
+        if i != 0 and int(i % (iterations / 20)) == 0:
+
+            # Print information
+            print('Iteration: ', str(i), '--- Time passed: ',
+                  round(time_intermediate, 2), 'seconds --- Loss: ',
+                  np.array(loss).astype(np.float32), '--- Content Loss: ',
                   np.array(content_loss).astype(np.float32), '--- Style Loss: ',
                   np.array(style_loss).astype(np.float32))
-            print(time.time() - timer)
 
-            img_gen = tensor_to_img(image_generated)
+            # Convert tensor image back to 'normal' image
+            img_gen = tensor2img(image_generated, content_orig_shape)
 
-            # Show intermediate result
-            #plt.imshow(img_gen)
-            #plt.axis('off')
-            #plt.show()
+            # Convert to BGR, save image with cv2, and keep track of names of
+            # intermediate images.
+            intermediate_img = cv2.cvtColor(img_gen, cv2.COLOR_RGB2BGR)
+            intermediate_img_names.append(str(i) + '.jpg')
+            cv2.imwrite(os.path.join(PATH_GENERATED, str(i) + '.jpg'), intermediate_img)
 
-    # Save final image
+            if visualize_intermediate:
+                # Show intermediate result
+                plt.imshow(img_gen)
+                plt.axis('off')
+                plt.show()
+
+    # Save result image locally
     final_img = cv2.cvtColor(img_gen, cv2.COLOR_RGB2BGR)
     cv2.imwrite(os.path.join(PATH_GENERATED, save_name), final_img)
 
+    # Print time for complete otimization process
+    print('Finished', str(iterations), 'iterations in',
+          round(time.time() - start_time, 2), 'seconds.')
 
-def run_all_combinations(model_st, content_images, style_images, content_weight, style_weight, num_iterations=200):
+    return np.array(intermediate_img_names)
+
+
+def run_all_combinations(content_images,
+                         style_images,
+                         optimizer,
+                         weight_content,
+                         weight_style,
+                         num_iterations=1000):
     """
-    Creates artistic style transfer for all possible combinations of given content and style images. Images
-    are saved in the directory 'images/generated' with the following naming convention:
-            nameOfContentImage-nameOfStyleImage.jpg
-    :param model_st: (tf sequential) Model for style transfer
-    :param content_images: (list) list of names of content images
-    :param style_images: (list) list of names of style images
-    :param content_weight: (float) weight for the content image
-    :param style_weight: (float) weight for the style image
-    :param num_iterations: (int) number of iterations of optimization process
-    :return: None
+    Runs style transfer on all possible combinations of given content and
+    style images.
+
+    :param content_images: (list) list of strings of content image file names
+    :param style_images: (list) list of strings of style image file names
+    return: (list) list of strings with result image names
     """
+    save_names = []
 
-    # Get all possible combinations of given content and style images.
-    for name_content_img in content_images:
+    # Iterate over content image
+    for content_name in content_images:
 
-        for name_style_img in style_images:
+        # For each content image, get the combination with each style image
+        for style_name in style_images:
+            # Keep track of progress
+            print('Next image...')
 
-            # Load images and preprocess them.
-            content_img, style_img = choose_images(name_content_img, name_style_img)
+            # Load and preprocess images
+            image_content, image_style, image_content_shape = prep_images(content_name, style_name)
 
             # Define name to save result image
-            result_img_name = name_content_img.split('.')[0] + '-' + name_style_img
+            save_name = content_name.split('.')[0] + '-' + style_name
+            save_names.append([content_name, style_name, save_name])
 
-            transfer_artistic_style(model_st,
-                                    num_iterations,
-                                    content_img,
-                                    style_img,
+            # Run artistic style transfer
+            transfer_artistic_style(num_iterations,
+                                    image_content,
+                                    image_style,
                                     optimizer,
-                                    content_weight,
-                                    style_weight,
-                                    result_img_name)
+                                    weight_content,
+                                    weight_style,
+                                    image_content_shape,
+                                    save_name)
+
+    return save_names
 
 
 if __name__ == '__main__':
@@ -202,29 +242,43 @@ if __name__ == '__main__':
                     'block4_conv1',
                     'block5_conv1']
 
-    # Build model from those pretrained layers
-    model, num_content_layers = build_model(content_layers, style_layers)
+    all_layers = content_layers + style_layers
 
-    # The model should not be trainable for the purpose of style transfer.
-    model.trainable = False
+    # Build model from those pretrained layers
+    model = StyleModel(len(content_layers), all_layers)
+
+    # Model should not be trainable for the purpose of style transfer
+    for layer in model.layers:
+        layer.trainable = False
 
     # Parameters: Adam optimizer, content and style weights, content and style images
-    optimizer = tf.optimizers.Adam(learning_rate=0.03)
-    weight_content = 1e4
-    weight_style = 0.5
+    optimizer = tf.optimizers.Adam(learning_rate=4)
+    weight_content = 1
+    weight_style = 1e-2
 
     # ---- EXECUTE ARTISTIC STYLE TRANSFER ----
 
     # Provide content and style images
     content_name = 'sunflower.jpg'
     style_name = 'the_scream.jpg'
-    image_content, image_style = choose_images(content_name, style_name)
+    image_content, image_style, image_content_shape = prep_images(content_name, style_name)
 
     # Define name to save final image
     save_name = content_name.split('.')[0] + '-' + style_name
 
     # Run artistic style transfer
-    transfer_artistic_style(model, 20, image_content, image_style, optimizer, weight_content, weight_style, save_name)
+    img_names = transfer_artistic_style(20,
+                                        image_content,
+                                        image_style,
+                                        optimizer,
+                                        weight_content,
+                                        weight_style,
+                                        image_content_shape,
+                                        save_name,
+                                        visualize_intermediate=False)
+
+    # Run visualizing code
+    visualize_progress(img_names)
 
     # ---- EXECUTE ARTISTIC STYLE TRANSFER ON ALL POSSIBLE COMBINATIONS ----
 
@@ -234,5 +288,13 @@ if __name__ == '__main__':
     # Get all style images
     all_style_images = STYLE_TITLE_DICT.keys()
 
-    # Run style transfer on all possible content and style image combinations
-    run_all_combinations(model, all_content_images, all_style_images, weight_content, weight_style, num_iterations=20)
+    # Run style transfer on all those possible combinations
+    save_names_own_content_imgs = run_all_combinations(all_content_images,
+                                                       all_style_images,
+                                                       optimizer,
+                                                       weight_content=1,
+                                                       weight_style=1e-2,
+                                                       num_iterations=10)
+
+    # Visualize all combinations
+    plot_combinations(save_names_own_content_imgs)

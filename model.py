@@ -3,71 +3,97 @@ from tensorflow.keras import Model
 
 import numpy as np
 
-def build_model(content_layers, style_layers):
+
+class StyleModel(Model):
+
+    def __init__(self, number_content_layers, layer_names):
+        """
+        Initializes a Style Transfer Model from layers of the VGG19 network.
+
+        :param number_content_layers: (int) Number of used content layers
+        :param layer_names: (list) list of strings with layer names (that must be layer names from VGG19)
+        return: None
+        """
+        super(StyleModel, self).__init__()
+
+        # Using the pretrained VGG19 model (on imagenet) with average pooling
+        # layers as in the original paper.
+        vgg19 = tf.keras.applications.VGG19(include_top=False,
+                                            weights='imagenet',
+                                            pooling='avg')
+
+        # Store to access the correct layers later. All other layers will be
+        # style layers
+        self.number_content_layers = number_content_layers
+
+        # Content and style layers respectively
+        self.content_layers = [vgg19.get_layer(layer).output
+                               for layer in layer_names[:number_content_layers]]
+        self.style_layers = [vgg19.get_layer(layer).output
+                             for layer in layer_names[number_content_layers:]]
+
+        # Concatenate to get all output layers
+        self.output_layers = self.content_layers + self.style_layers
+
+        # Build model
+        self.model = Model([vgg19.input], self.output_layers)
+
+
+    def call(self, img):
+        """
+        Processes a given image with the Style Transfer model.
+
+        :param img: (tensor) input image, zero-centered, BGR in range [0, 255]
+        return: (list) list of outputs from each layer
+        """
+
+        # Get list of outputs
+        outputs = self.model(img)
+
+        return outputs
+
+
+def gram_matrix(feature_maps, num_channels):
+    """
+    Defines the gram matrix for a given layer.
+
+    :param feature_maps: feature maps from one layer
+    :param num_channels: (int) number of feature maps in given layer
+    return: gram-matrix of shape (num_channels x num_channels)
     """
 
-    :param content_layers:
-    :param style_layers:
-    :return:
-    """
+    # Vectorize feature maps
+    feature_maps_vectorized = tf.reshape(feature_maps, [-1, num_channels])
 
-    num_content_layers = len(content_layers)
-    layers_combined = content_layers + style_layers
-
-    # Load pretrained VGG19 model with average pooling.
-    vgg19 = tf.keras.applications.VGG19(include_top=False,
-                                        weights='imagenet',
-                                        pooling='avg')
-
-    # The model should not be trainable for the purpose of style transfer.
-    vgg19.trainable = False
-
-    # Get outputs from the content and style layers we defined above
-    output = [vgg19.get_layer(layer).output for layer in layers_combined]
-
-    # Build the model
-    model = Model([vgg19.input], output)
-
-    return model, num_content_layers
-
-def gram_matrix(filter_response, num_channels):
-    """
-
-    :param filter_response:
-    :param num_channels:
-    :return:
-    """
-
-    # Reshape c-many to vectors
-    filter_response = tf.reshape(filter_response, [-1, num_channels])   # hier bin ich auch unsicher
-
-    # Multiply 'filters' to itself.
-    gram_matrix = tf.matmul(filter_response, filter_response, transpose_a=True)  # unsicher welches ich true und welches false setzen muss # JOHANNA: Hier könnten wir zur Kontrolle einfach einmal schauen, ob wir die shape NxN (wie im paper) rausbekommen :)
-
-    # Divide by the number of channels for ... .
-    gram_matrix = gram_matrix / tf.cast(num_channels, tf.float32)   # hier 1. unsicher ob das die richtigen Variablen sind und 2. ob ich das mit normaler Division machen kann oder auch eine tf function brauche (wie tf.matmul...)
+    # Multiply vectorized 'feature maps' to themselves to get the gram matrix
+    # of shape (num_channels x num_channels).
+    gram_matrix = tf.matmul(feature_maps_vectorized, feature_maps_vectorized, transpose_a=True)
 
     return gram_matrix
 
 
 def loss_style(outputs, targets):
     """
+    Calculates the style loss. The style loss is the weighted mean squared
+    error between the output gram matrix and target gram matrix of each
+    respective layer.
 
-    :param outputs:
-    :param targets:
-    :return:
+    :param outputs: layer activations for generated image
+    :param targets: layer activations for target style image
+    return: (float) style loss
     """
 
     # Initialize mean-squared-error (mse) loss.
-    mse = 0
+    mse = 0.
 
-    # Check if function was called with correct parameters. # TODO: Further assertions
-    assert len(outputs) == len(targets), 'Outputs and targets must have the same length, ' \
-                                         'which refers to the same amount of layers.'
+    # Check if function was called with correct parameters.
+    assert len(outputs) == len(targets), 'Outputs and targets must have the \
+      same length, which refers to the same amount of layers.'
 
     # Iterate over all output and target feature maps.
     for output, target in zip(outputs, targets):
-        assert np.array(output).shape == np.array(target).shape, 'Shape mismatch of output and target feature maps.'
+        assert np.array(output).shape == np.array(target).shape, 'Shape mismatch \
+        of output and target feature maps.'
 
         # Get shape info: h -> height, w -> width, c -> number of channels
         _, h, w, c = np.array(output.shape).astype(np.uint32)
@@ -76,32 +102,35 @@ def loss_style(outputs, targets):
         gram_outputs = gram_matrix(output, c)
         gram_targets = gram_matrix(target, c)
 
-        # Calculate error. Error is immediately weighted by the number of style
-        # layers, which is represented by 'len(outputs)'.
-        error = (1 / len(outputs)) * tf.square(gram_outputs - gram_targets)
-        mse += tf.reduce_mean(error)
-
-        # DEVIATION FROM REPLICATION PAPER:
-        # In the original paper, 'mse' would be divided by '(4 * c**2 * (h*w)**2)'.
-        # We found that for our implementation, this makes the loss extremely
-        # small. We could scale this value up with a very high weight for the style
-        # loss, however we found our results to be very appealing without this
-        # term, so we simply left it out in our implementation but still wanted to
-        # mention it.
+        # Calculate error. Error is weighted first to get the mean error and then
+        # by the number of style layers, which is represented by 'len(outputs)'.
+        weighting_factor = 1 / (4. * c ** 2 * (h * w) ** 2)
+        error = weighting_factor * \
+                tf.reduce_sum(tf.square(gram_outputs - gram_targets))
+        mse += (1. / len(outputs)) * error
 
     return mse
 
 
-def loss_content(output, target):
+def loss_content(outputs, targets):
+    """
+    Calculates the mean squared error (MSE) for the content activations.
+
+    :param outputs: layer activations of generated image
+    :param targets: layer activations of target content image
+    return: Mean squared error
     """
 
-    :param output:
-    :param target:
-    :return:
-    """
+    assert len(outputs) == len(targets), 'Length of content outputs and targets must match!'
 
-    # MSE loss
-    error = tf.square(output - target)
-    mse = 1/2 * tf.reduce_mean(error)
+    # Weight by number of layers
+    weight = 1 / len(outputs)
+
+    # MSE is the mean over squared deviation of output and target.
+    mse = 0
+    for output, target in zip(outputs, targets):
+
+        # Add up weighted errors
+        mse += weight * tf.reduce_mean(tf.square(output - target))
 
     return mse
