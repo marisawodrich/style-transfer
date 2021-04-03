@@ -11,7 +11,7 @@ Artistic style transfer aims at transferring the style of a given image to an ar
 * The Shipwreck of the Minotaur by William Turner (1810) *- Romantic*
 
 Our replication results of the artistic style transfer on the combinations of the original paper can be seen in the following figure. For further results and experiments on other content and style images, we would like to refer to our paper which can be found [here]. % insert reference
-![neckarfront_combinations](https://github.com/[marisawodrich]/[style-transfer]/blob/[main]/figures/neckarfront_combinations.PNG?raw=true)
+![plot](./figures/neckarfront_combinations.PNG)
 
 ## File Structure
 * main.py \ functions to run the style transfer on one or more combinations
