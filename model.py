@@ -37,7 +37,7 @@ class StyleModel(Model):
         # Build model
         self.model = Model([vgg19.input], self.output_layers)
 
-
+    @tf.function
     def call(self, img):
         """
         Processes a given image with the Style Transfer model.
