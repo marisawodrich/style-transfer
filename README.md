@@ -31,7 +31,7 @@ Our replication results of the artistic style transfer on the combinations of th
 
 We provide a Google Colab version, a Jupyter Notebook and a local version with a proper file structure. We would highly recommend to use the Google Colab version as the code is put into context with the original paper there and the style transfer process is sped up using the free GPU provided by Google.
 We were not able to test our local version using a GPU, so adaptions might be necessary there. However, there should be no issues running the code on CPU, although we would not recommend it as the optimization process can take very long without a GPU. We tested the environment setup on Windows machines.
-1. [Colab](https://colab.research.google.com/drive/1QyBRdjDXfPIMuP-nY-vcj8sMbqkp2viM#scrollTo=gS0RpbSgFcXb)
+1. Click [here](https://colab.research.google.com/drive/1QyBRdjDXfPIMuP-nY-vcj8sMbqkp2viM#scrollTo=gS0RpbSgFcXb) to get to the Google Colab
 2. Local (You should have Anaconda or Miniconda installed):
     * Create a new conda environment with python version 3.7.10 uring the following command (please adapt NAME to your preferred environment name)
       * conda create --name NAME python=3.7.10
