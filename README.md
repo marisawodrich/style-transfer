@@ -10,7 +10,7 @@ Artistic style transfer aims at transferring the style of a given image to an ar
 * The Scream by Edvard Munch (1893) *- Expressionism*
 * The Shipwreck of the Minotaur by William Turner (1810) *- Romantic*
 
-Our replication results of the artistic style transfer on the combinations of the original paper can be seen in the following figure. For further results and experiments on other content and style images, we would like to refer to our paper which can be found [here]. % insert reference
+Our replication results of the artistic style transfer on the combinations of the original paper can be seen in the following figure. For further results and experiments on other content and style images, we would like to refer to our paper which can be found [here](https://github.com/marisawodrich/style-transfer/blob/main/replication_paper/style_transfer_not_finished.pdf).
 
 ![plot](./figures/neckarfront_combinations.PNG)
 
@@ -42,7 +42,7 @@ We were not able to test our local version using a GPU, so adaptions might be ne
    * python main.py
    
    Or, you can take a look at the demo Notebook. Please note that this notebook mimics the structure of the Google Colab we created, however instead of defining the functions, they will be imported at the corresponding positions. They could be loaded all at once in the beginning, but we considered this style to be more readable for the user, as this way, the functions are loaded where they are actually used.
-   Run the following command and then, in your preferred browser in the jupyter overview, open the 'demo.ipynb' file
+   Run the following command and then, in your preferred browser in the jupyter overview, select the 'demo.ipynb' file.
    * jupyter notebook
 
 ## References
