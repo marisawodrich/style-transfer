@@ -1,3 +1,5 @@
+import argparse
+
 import tensorflow as tf
 import numpy as np
 import os
@@ -215,6 +217,19 @@ def run_all_combinations(model,
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="A Style Transfer Program")
+    parser.add_argument(
+        "--iterations",
+        help="Number of iterations for the optimization progress",
+        type=int,
+    )
+
+    args = parser.parse_args()
+
+    if args.iterations is None:
+        iterations = 20
+    else:
+        iterations = args.iterations
 
     # Create directories from predefined paths.
     create_required_directories()
@@ -269,7 +284,7 @@ if __name__ == '__main__':
 
     # Run artistic style transfer
     img_names = transfer_artistic_style(model,
-                                        20,
+                                        iterations,
                                         image_content,
                                         image_style,
                                         optimizer,
@@ -279,8 +294,8 @@ if __name__ == '__main__':
                                         save_name,
                                         visualize_intermediate=False)
 
-    # Run visualizing code
-    visualize_progress(img_names)
+    # Run visualizing code (Uncomment if progress visualization is preferred)
+    #visualize_progress(img_names)
 
     # ---- EXECUTE ARTISTIC STYLE TRANSFER ON ALL POSSIBLE COMBINATIONS ----
 
@@ -297,7 +312,7 @@ if __name__ == '__main__':
                                                        optimizer,
                                                        weight_content=1,
                                                        weight_style=1e-2,
-                                                       num_iterations=10)
+                                                       num_iterations=iterations)
 
-    # Visualize all combinations
-    plot_combinations(save_names_own_content_imgs)
+    # Visualize all combinations (Uncomment if progress visualization is preferred)
+    #plot_combinations(save_names_own_content_imgs)
