@@ -31,25 +31,25 @@ Our replication results of the artistic style transfer on the combinations of th
 
 We provide a Google Colab version, a Jupyter Notebook and a local version with a proper file structure. We would highly recommend to use the Google Colab version as the code is put into context with the original paper there and the style transfer process is sped up using the free GPU provided by Google.
 We were not able to test our local version using a GPU, so adaptions might be necessary there. However, there should be no issues running the code on CPU, although we would not recommend it as the optimization process can take very long without a GPU. We tested the environment setup on Windows machines.
-1. [Colab](https://colab.research.google.com/drive/1QyBRdjDXfPIMuP-nY-vcj8sMbqkp2viM#scrollTo=gS0RpbSgFcXb)
+1. Click [here](https://colab.research.google.com/drive/1QyBRdjDXfPIMuP-nY-vcj8sMbqkp2viM#scrollTo=gS0RpbSgFcXb) to get to the Google Colab
 2. Local (You should have Anaconda or Miniconda installed):
     * Create a new conda environment with python version 3.7.10 uring the following command (please adapt NAME to your preferred environment name)
-      * conda create --name NAME python=3.7.10
+      * `conda create --name NAME python=3.7.10`
     * Activate the environment using with the following command
-      * conda activate NAME
+      * `conda activate NAME`
     * Go to the directory (PATH) you would like this repo to be cloned in
-      * cd PATH
+      * `cd PATH`
     * Run the following commands:
-      * git clone https://github.com/marisawodrich/style-transfer.git
-      * cd style-transfer
-      * pip3 install -r requirements.txt
+      * `git clone https://github.com/marisawodrich/style-transfer.git`
+      * `cd style-transfer`
+      * `pip3 install -r requirements.txt`
    
    Run the following command (remain in the 'style-transfer' directory) to run the style transfer locally. The result images are the combinations of all images presented in our paper but not all images from the orginal paper. The generated images will be stored in the images/generated direcotory along with some progress images. The following line will optimize all combinations for 1000 iterations. You can change this value to any amount of iterations you prefer, the value will default to 20 if you only run 'python main.py'.
-   * python main.py --iterations 1000
+   * `python main.py --iterations 1000`
    
    Or, you can take a look at the demo Notebook. Please note that this notebook mimics the structure of the Google Colab we created, however instead of defining the functions, they will be imported at the corresponding positions. They could be loaded all at once in the beginning, but we considered this style to be more readable for the user, as this way, the functions are loaded where they are actually used.
    Run the following command and then, in your preferred browser in the jupyter overview, select the 'demo.ipynb' file.
-   * jupyter notebook
+   * `jupyter notebook`
 
 ## References for the Code
 * Gatys, L. A., Ecker, A. S., & Bethge, M. (2015). A neural algorithm of artistic style. arXiv preprint arXiv:1508.06576.
