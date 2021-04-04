@@ -56,7 +56,8 @@ CONTENT_IMAGES = [['https://www.myhomebook.de/data/uploads/2020/02/gettyimages-1
                    False]]
 
 
-def transfer_artistic_style(iterations,
+def transfer_artistic_style(model,
+                            iterations,
                             content,
                             style,
                             optimizer,
@@ -169,7 +170,8 @@ def transfer_artistic_style(iterations,
     return np.array(intermediate_img_names)
 
 
-def run_all_combinations(content_images,
+def run_all_combinations(model,
+                         content_images,
                          style_images,
                          optimizer,
                          weight_content,
@@ -190,8 +192,6 @@ def run_all_combinations(content_images,
 
         # For each content image, get the combination with each style image
         for style_name in style_images:
-            # Keep track of progress
-            print('Next image...')
 
             # Load and preprocess images
             image_content, image_style, image_content_shape = prep_images(content_name, style_name)
@@ -201,7 +201,8 @@ def run_all_combinations(content_images,
             save_names.append([content_name, style_name, save_name])
 
             # Run artistic style transfer
-            transfer_artistic_style(num_iterations,
+            transfer_artistic_style(model,
+                                    num_iterations,
                                     image_content,
                                     image_style,
                                     optimizer,
@@ -267,7 +268,8 @@ if __name__ == '__main__':
     save_name = content_name.split('.')[0] + '-' + style_name
 
     # Run artistic style transfer
-    img_names = transfer_artistic_style(20,
+    img_names = transfer_artistic_style(model,
+                                        20,
                                         image_content,
                                         image_style,
                                         optimizer,
@@ -289,7 +291,8 @@ if __name__ == '__main__':
     all_style_images = STYLE_TITLE_DICT.keys()
 
     # Run style transfer on all those possible combinations
-    save_names_own_content_imgs = run_all_combinations(all_content_images,
+    save_names_own_content_imgs = run_all_combinations(model,
+                                                       all_content_images,
                                                        all_style_images,
                                                        optimizer,
                                                        weight_content=1,

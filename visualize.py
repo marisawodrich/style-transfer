@@ -5,7 +5,7 @@ from PIL import Image
 from helpers import CONTENT_TITLE_DICT, STYLE_TITLE_DICT, PATH_CONTENT, PATH_STYLE, PATH_GENERATED
 
 
-def visualize_images(path, plot_title):
+def visualize_images(path, plot_title, notebook=False):
     """
     This function creates a plot of all images contained in the directory (given
     path).
@@ -62,7 +62,14 @@ def visualize_images(path, plot_title):
             ax.axis('off')
             ax.title.set_text(img_name)
 
-    plt.suptitle(plot_title + '\n(Code execution pauses until this window is closed)')
+    # Running this locally and not in the demo.ipynb, one has to close the created plot
+    # manually before the code execution continues
+    if notebook:
+        print(plot_title)
+    else:
+        plot_title += '\n(Code execution pauses until this window is closed)'
+        plt.suptitle(plot_title)
+
     plt.tight_layout()
     plt.show()
 
