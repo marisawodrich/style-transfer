@@ -27,9 +27,12 @@ We provide a Google Colab version, a Jupyter Notebook and a local version with a
 We were not able to test our local version using a GPU, so adaptions might be necessary there. However, there should be no issues running the code on CPU, although we would not recommend it as the optimization process can take very long without a GPU. We tested the environment setup on Windows machines.
 1. [Colab](https://colab.research.google.com/drive/1QyBRdjDXfPIMuP-nY-vcj8sMbqkp2viM#scrollTo=gS0RpbSgFcXb)
 2. Local (You should have Anaconda or Miniconda installed):
-    * Create a new conda environment with python version 3.7.10 (command: conda create --name NAME python=3.7.10) 
-    * Activate the environment (conda activate NAME)
-    * Go to the directory you would like this repo to be cloned in
+    * Create a new conda environment with python version 3.7.10 uring the following command (please adapt NAME to your preferred environment name)
+      * conda create --name NAME python=3.7.10
+    * Activate the environment using with the following command
+      * conda activate NAME
+    * Go to the directory (PATH) you would like this repo to be cloned in
+      * cd PATH
     * Run the following commands:
       * git clone https://github.com/marisawodrich/style-transfer.git
       * cd style-transfer
@@ -38,7 +41,8 @@ We were not able to test our local version using a GPU, so adaptions might be ne
    Run the following command (remain in the 'style-transfer' directory) to run the style transfer locally
    * python main.py
    
-   Or, you can take a look at the Notebook. Run the following command and then, in jupyter, open the 'demo.ipynb' file
+   Or, you can take a look at the demo Notebook. Please note that this notebook mimics the structure of the Google Colab we created, however instead of defining the functions, they will be imported at the corresponding positions. They could be loaded all at once in the beginning, but we considered this style to be more readable for the user, as this way, the functions are loaded where they are actually used.
+   Run the following command and then, in your preferred browser in the jupyter overview, open the 'demo.ipynb' file
    * jupyter notebook
 
 ## References
