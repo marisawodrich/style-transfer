@@ -44,8 +44,8 @@ We were not able to test our local version using a GPU, so adaptions might be ne
       * cd style-transfer
       * pip3 install -r requirements.txt
    
-   Run the following command (remain in the 'style-transfer' directory) to run the style transfer locally
-   * python main.py
+   Run the following command (remain in the 'style-transfer' directory) to run the style transfer locally. The result images are the combinations of all images presented in our paper but not all images from the orginal paper. The generated images will be stored in the images/generated direcotory along with some progress images. The following line will optimize all combinations for 1000 iterations. You can change this value to any amount of iterations you prefer, the value will default to 20 if you only run 'python main.py'.
+   * python main.py --iterations 1000
    
    Or, you can take a look at the demo Notebook. Please note that this notebook mimics the structure of the Google Colab we created, however instead of defining the functions, they will be imported at the corresponding positions. They could be loaded all at once in the beginning, but we considered this style to be more readable for the user, as this way, the functions are loaded where they are actually used.
    Run the following command and then, in your preferred browser in the jupyter overview, select the 'demo.ipynb' file.
