@@ -54,4 +54,5 @@ We were not able to test our local version using a GPU, so adaptions might be ne
 ## References for the Code
 * Gatys, L. A., Ecker, A. S., & Bethge, M. (2015). A neural algorithm of artistic style. arXiv preprint arXiv:1508.06576.
 * Neural Style Transfer with tf.keras. https://colab.research.google.com/github/tensorflow/models/blob/master/research/nst_blogpost/4_Neural_Style_Transfer_with_Eager_Execution.ipynb#scrollTo=sElaeNX-4Vnc [accessed 2021-04-03].
+* TensorFlow (last Update: 2021). Neural style transfer. https://www.tensorflow.org/tutorials/generative/style_transfer?hl=en [accessed 2021-04-04].
 * Extract Features, Visualize Filters and Feature Maps in VGG16 and VGG19 CNN Models (2020). https://towardsdatascience.com/extract-features-visualize-filters-and-feature-maps-in-vgg16-and-vgg19-cnn-models-d2da6333edd0 [accessed 2021-04-04].
