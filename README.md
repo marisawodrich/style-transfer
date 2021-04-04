@@ -49,7 +49,7 @@ We were not able to test our local version using a GPU, so adaptions might be ne
    
    Or, you can take a look at the demo Notebook. Please note that this notebook mimics the structure of the Google Colab we created, however instead of defining the functions, they will be imported at the corresponding positions. They could be loaded all at once in the beginning, but we considered this style to be more readable for the user, as this way, the functions are loaded where they are actually used.
    Run the following command and then, in your preferred browser in the jupyter overview, select the 'demo.ipynb' file.
-   * jupyter notebook
+   * `jupyter notebook`
 
 ## References for the Code
 * Gatys, L. A., Ecker, A. S., & Bethge, M. (2015). A neural algorithm of artistic style. arXiv preprint arXiv:1508.06576.
