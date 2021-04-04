@@ -20,6 +20,12 @@ Our replication results of the artistic style transfer on the combinations of th
 * processing.py \ functions for pre- and postprocessing
 * helpers.py \  helper functions to create image directories, load images, test and call processing functions
 * visualize.py \ functions to visualize images, adaption progress and other plots
+* requirements.txt \ dependencies for the conda environment
+* demo.ipynb \ notebook to test the style transfer
+
+## Directory Structure
+* figures \ figures used in the ReadMe, our Google Colab and the replication paper
+* replication_paper \ contains our replication paper
 
 ## Running the Style Transfer
 
@@ -45,7 +51,7 @@ We were not able to test our local version using a GPU, so adaptions might be ne
    Run the following command and then, in your preferred browser in the jupyter overview, select the 'demo.ipynb' file.
    * jupyter notebook
 
-## References
-* Paper
-* Colab 1
-* Colab 2
+## References for the Code
+* Gatys, L. A., Ecker, A. S., & Bethge, M. (2015). A neural algorithm of artistic style. arXiv preprint arXiv:1508.06576.
+* Neural Style Transfer with tf.keras. https://colab.research.google.com/github/tensorflow/models/blob/master/research/nst_blogpost/4_Neural_Style_Transfer_with_Eager_Execution.ipynb#scrollTo=sElaeNX-4Vnc [accessed 2021-04-03].
+* Extract Features, Visualize Filters and Feature Maps in VGG16 and VGG19 CNN Models (2020). https://towardsdatascience.com/extract-features-visualize-filters-and-feature-maps-in-vgg16-and-vgg19-cnn-models-d2da6333edd0 [accessed 2021-04-04].
