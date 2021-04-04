@@ -31,9 +31,9 @@ We were not able to test our local version using a GPU, so adaptions might be ne
     * Activate the environment (conda activate NAME)
     * Go to the directory you would like this repo to be cloned in
     * Run the following commands:
-    *    git clone https://github.com/marisawodrich/style-transfer.git
-    *    cd style-transfer
-    *    pip3 install -r requirements.txt
+      * git clone https://github.com/marisawodrich/style-transfer.git
+      * cd style-transfer
+      * pip3 install -r requirements.txt
    
    Run the following command (remain in the 'style-transfer' directory) to run the style transfer locally
    * python main.py
